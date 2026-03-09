@@ -6,6 +6,8 @@ import { Award, ArrowLeft, ChevronRight, CheckCircle, ExternalLink } from 'lucid
 import CTABanner from '@/components/sections/CTABanner';
 import { getCertifications, getCertificationBySlug } from '@/lib/data';
 
+export const revalidate = 60;
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }

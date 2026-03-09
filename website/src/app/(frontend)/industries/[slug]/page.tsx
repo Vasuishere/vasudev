@@ -6,6 +6,8 @@ import DriveImage from '@/components/ui/DriveImage';
 import CTABanner from '@/components/sections/CTABanner';
 import { getIndustries, getIndustryBySlug, getProducts } from '@/lib/data';
 
+export const revalidate = 60;
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }

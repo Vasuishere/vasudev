@@ -1,6 +1,8 @@
 import { getProducts } from '@/lib/data';
 import ProductsClient from './ProductsClient';
 
+export const revalidate = 60;
+
 export const metadata = {
   title: 'Products — Vasudev Chemo Pharma',
   description: 'Browse our complete range of industrial and specialty chemical products.',

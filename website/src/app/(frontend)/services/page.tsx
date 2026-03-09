@@ -5,6 +5,8 @@ import SectionHeading from '@/components/ui/SectionHeading';
 import { getServices } from '@/lib/data';
 import type { Metadata } from 'next';
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'Services',
   description: 'Vasudev Chemo Pharma offers manufacturing, custom formulation, quality assurance, and export logistics services for industrial & specialty chemicals.',

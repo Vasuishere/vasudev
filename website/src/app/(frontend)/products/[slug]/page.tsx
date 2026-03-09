@@ -6,6 +6,8 @@ import { getProducts, getProductBySlug } from '@/lib/data';
 import { company } from '@/data/company';
 import type { Metadata } from 'next';
 
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   const products = await getProducts();
   return products.map((product) => ({ slug: product.slug }));

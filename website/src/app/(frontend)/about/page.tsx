@@ -6,6 +6,8 @@ import { company, certifications } from '@/data/company';
 import { getSiteImages } from '@/lib/data';
 import type { Metadata } from 'next';
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'About Us',
   description: 'Learn about Vasudev Chemo Pharma — a Gujarat-based ISO 9001:2015 certified manufacturer and exporter of industrial & specialty chemicals since 2014.',

@@ -1,6 +1,8 @@
 import { getFaqs, getCompanyInfo } from '@/lib/data';
 import FaqClient from './FaqClient';
 
+export const revalidate = 60;
+
 export const metadata = {
   title: 'FAQ — Vasudev Chemo Pharma',
   description: 'Common questions about our products, ordering process, shipping, and quality standards.',

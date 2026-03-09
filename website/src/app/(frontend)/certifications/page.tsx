@@ -4,6 +4,8 @@ import CTABanner from '@/components/sections/CTABanner';
 import { getCertifications } from '@/lib/data';
 import { Shield, CheckCircle, Globe, FileCheck } from 'lucide-react';
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'Certifications & Compliance | Vasudev Chemo Pharma',
   description:

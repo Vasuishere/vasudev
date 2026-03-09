@@ -9,6 +9,8 @@ import SectionHeading from '@/components/ui/SectionHeading';
 import ProductCard from '@/components/ui/ProductCard';
 import { getProducts, getIndustries, getCompanyInfo } from '@/lib/data';
 
+export const revalidate = 60;
+
 export default async function Home() {
   const [products, allIndustries, company] = await Promise.all([
     getProducts(),

@@ -5,6 +5,8 @@ import SectionHeading from '@/components/ui/SectionHeading';
 import { getIndustries, getProducts } from '@/lib/data';
 import type { Metadata } from 'next';
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'Industries Served',
   description: 'Vasudev Chemo Pharma supplies industrial & specialty chemicals to pharmaceuticals, textiles, paints, water treatment, food processing, and more.',
