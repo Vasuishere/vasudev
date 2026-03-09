@@ -22,14 +22,16 @@ export default function ProductCard({ product }: { product: Product }) {
           <FlaskConical className="w-12 h-12 text-primary/20" />
         )}
         <span className="absolute top-3 right-3 text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/90 text-primary backdrop-blur-sm">
-          {product.category === 'industrial' ? 'Industrial' : 'Specialty'}
+          {product.category === 'industrial' ? 'Industrial' : product.category === 'pharmaceutical' ? 'Pharma API' : 'Specialty'}
         </span>
       </div>
 
       {/* Content */}
       <div className="p-6 flex flex-col flex-grow">
         <h3 className="text-lg font-bold text-text mb-1 font-heading">{product.name}</h3>
-        <p className="text-xs text-text-muted font-medium mb-3">CAS: {product.cas} · {product.formula}</p>
+        <p className="text-xs text-text-muted font-medium mb-3">
+          {[product.cas && `CAS: ${product.cas}`, product.formula].filter(Boolean).join(' · ') || product.subcategory || ''}
+        </p>
         <p className="text-sm text-text-light mb-4 leading-relaxed flex-grow line-clamp-2">{product.description}</p>
 
         {/* Tags */}

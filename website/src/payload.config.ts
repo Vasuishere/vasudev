@@ -5,17 +5,17 @@ import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import sharp from 'sharp';
 
-import { Users } from './collections/Users';
-import { Products } from './collections/Products';
-import { Certifications } from './collections/Certifications';
-import { Industries } from './collections/Industries';
-import { BlogPosts } from './collections/BlogPosts';
-import { Clients } from './collections/Clients';
-import { Faqs } from './collections/Faqs';
-import { Services } from './collections/Services';
-import { Media } from './collections/Media';
-import { CompanyInfo } from './globals/CompanyInfo';
-import { SiteImages } from './globals/SiteImages';
+import { Users } from './collections/Users.ts';
+import { Products } from './collections/Products.ts';
+import { Certifications } from './collections/Certifications.ts';
+import { Industries } from './collections/Industries.ts';
+import { BlogPosts } from './collections/BlogPosts.ts';
+import { Clients } from './collections/Clients.ts';
+import { Faqs } from './collections/Faqs.ts';
+import { Services } from './collections/Services.ts';
+import { Media } from './collections/Media.ts';
+import { CompanyInfo } from './globals/CompanyInfo.ts';
+import { SiteImages } from './globals/SiteImages.ts';
 
 const __dirname = import.meta.dirname ?? path.dirname(fileURLToPath(import.meta.url));
 

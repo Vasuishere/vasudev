@@ -7,7 +7,7 @@
 import { getPayloadClient } from './payload';
 
 // Static fallbacks
-import { products as staticProducts, type Product } from '@/data/products';
+import { products as staticProducts, type Product, type ProductDocument } from '@/data/products';
 import { certifications as staticCertifications, type Certification } from '@/data/certifications';
 import { industries as staticIndustries, type Industry } from '@/data/industries';
 import { blogPosts as staticBlogPosts, type BlogPost } from '@/data/blog';
@@ -29,31 +29,60 @@ function extractSpecs(arr: { key: string; value: string }[] | undefined): Record
   return Object.fromEntries(arr.map((item) => [item.key, item.value]));
 }
 
+function extractDocuments(arr: Record<string, unknown>[] | undefined): ProductDocument[] {
+  if (!arr) return [];
+  return arr.map((d) => ({
+    docType: d.docType as ProductDocument['docType'],
+    fileUrl: d.fileUrl as string,
+    fileName: d.fileName as string | undefined,
+    uploadedBy: d.uploadedBy as string | undefined,
+    accessLevel: (d.accessLevel as ProductDocument['accessLevel']) ?? 'public',
+  }));
+}
+
+function mapDocToProduct(doc: Record<string, unknown>): Product {
+  return {
+    slug: doc.slug as string,
+    name: doc.name as string,
+    sku: doc.sku as string | undefined,
+    formula: doc.formula as string | undefined,
+    cas: doc.cas as string | undefined,
+    category: doc.category as Product['category'],
+    subcategory: doc.subcategory as string | undefined,
+    description: doc.description as string,
+    applications: extractArray(doc.applications as { value: string }[]),
+    industries: extractArray(doc.industries as { value: string }[]),
+    grades: extractArray(doc.grades as { value: string }[]),
+    packaging: extractArray(doc.packaging as { value: string }[]),
+    specs: extractSpecs(doc.specs as { key: string; value: string }[]),
+    tags: extractArray(doc.tags as { value: string }[]),
+    imageUrl: doc.imageUrl as string | undefined,
+    images: (doc.images as { url: string; caption: string }[] | undefined) ?? [],
+    supplier: doc.supplier as string | undefined,
+    originCountry: doc.originCountry as string | undefined,
+    price: doc.price as number | undefined,
+    currency: doc.currency as string | undefined,
+    priceUnit: doc.priceUnit as string | undefined,
+    unitOfMeasure: doc.unitOfMeasure as string | undefined,
+    weight: doc.weight as string | undefined,
+    dimensions: doc.dimensions as string | undefined,
+    safetyClass: doc.safetyClass as string | undefined,
+    documents: extractDocuments(doc.documents as Record<string, unknown>[] | undefined),
+    status: (doc.status as Product['status']) ?? 'active',
+  };
+}
+
 // ─── Products ───────────────────────────────────────────────
 export async function getProducts(): Promise<Product[]> {
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
       collection: 'products',
-      limit: 100,
+      limit: 200,
       sort: 'name',
     });
     if (result.totalDocs === 0) return [...staticProducts];
-    return result.docs.map((doc) => ({
-      slug: doc.slug,
-      name: doc.name,
-      formula: doc.formula,
-      cas: doc.cas,
-      category: doc.category as 'industrial' | 'specialty',
-      description: doc.description,
-      applications: extractArray(doc.applications as { value: string }[]),
-      industries: extractArray(doc.industries as { value: string }[]),
-      grades: extractArray(doc.grades as { value: string }[]),
-      packaging: extractArray(doc.packaging as { value: string }[]),
-      specs: extractSpecs(doc.specs as { key: string; value: string }[]),
-      imageUrl: (doc as Record<string, unknown>).imageUrl as string | undefined,
-      images: ((doc as Record<string, unknown>).images as { url: string; caption: string }[] | undefined) ?? [],
-    }));
+    return result.docs.map((doc) => mapDocToProduct(doc as unknown as Record<string, unknown>));
   } catch {
     return [...staticProducts];
   }
@@ -68,22 +97,7 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
       limit: 1,
     });
     if (result.totalDocs === 0) return staticProducts.find((p) => p.slug === slug);
-    const doc = result.docs[0];
-    return {
-      slug: doc.slug,
-      name: doc.name,
-      formula: doc.formula,
-      cas: doc.cas,
-      category: doc.category as 'industrial' | 'specialty',
-      description: doc.description,
-      applications: extractArray(doc.applications as { value: string }[]),
-      industries: extractArray(doc.industries as { value: string }[]),
-      grades: extractArray(doc.grades as { value: string }[]),
-      packaging: extractArray(doc.packaging as { value: string }[]),
-      specs: extractSpecs(doc.specs as { key: string; value: string }[]),
-      imageUrl: (doc as Record<string, unknown>).imageUrl as string | undefined,
-      images: ((doc as Record<string, unknown>).images as { url: string; caption: string }[] | undefined) ?? [],
-    };
+    return mapDocToProduct(result.docs[0] as unknown as Record<string, unknown>);
   } catch {
     return staticProducts.find((p) => p.slug === slug);
   }

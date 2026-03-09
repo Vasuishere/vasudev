@@ -8,6 +8,7 @@ const categories = [
   { key: 'all', label: 'All Products' },
   { key: 'industrial', label: 'Industrial Chemicals' },
   { key: 'specialty', label: 'Specialty Chemicals' },
+  { key: 'pharmaceutical', label: 'Pharma API Intermediates' },
 ] as const;
 
 export default function ProductsClient({ products }: { products: Product[] }) {

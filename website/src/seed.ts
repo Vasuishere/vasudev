@@ -5,15 +5,15 @@
  */
 import 'dotenv/config';
 import { getPayload } from 'payload';
-import configPromise from './payload.config';
+import configPromise from './payload.config.ts';
 
 // Static data imports
-import { products } from './data/products';
-import { certifications } from './data/certifications';
-import { industries } from './data/industries';
-import { blogPosts } from './data/blog';
-import { clients } from './data/clients';
-import { company, faqs, services } from './data/company';
+import { products } from './data/products.ts';
+import { certifications } from './data/certifications.ts';
+import { industries } from './data/industries.ts';
+import { blogPosts } from './data/blog.ts';
+import { clients } from './data/clients.ts';
+import { company, faqs, services } from './data/company.ts';
 
 async function seed() {
   const payload = await getPayload({ config: configPromise });
@@ -65,15 +65,35 @@ async function seed() {
         data: {
           name: product.name,
           slug: product.slug,
+          sku: product.sku,
           formula: product.formula,
           cas: product.cas,
           category: product.category,
+          subcategory: product.subcategory,
           description: product.description,
+          supplier: product.supplier,
+          originCountry: product.originCountry,
+          price: product.price,
+          currency: product.currency,
+          priceUnit: product.priceUnit,
+          unitOfMeasure: product.unitOfMeasure,
+          weight: product.weight,
+          dimensions: product.dimensions,
+          safetyClass: product.safetyClass,
+          status: product.status ?? 'active',
           applications: (product.applications ?? []).map((a) => ({ value: a })),
           industries: (product.industries ?? []).map((i) => ({ value: i })),
           grades: (product.grades ?? []).map((g) => ({ value: g })),
           packaging: (product.packaging ?? []).map((p) => ({ value: p })),
+          tags: (product.tags ?? []).map((t) => ({ value: t })),
           specs: Object.entries(product.specs ?? {}).map(([key, value]) => ({ key, value })),
+          documents: (product.documents ?? []).map((d) => ({
+            docType: d.docType,
+            fileUrl: d.fileUrl,
+            fileName: d.fileName,
+            uploadedBy: d.uploadedBy,
+            accessLevel: d.accessLevel ?? 'public',
+          })),
         },
       });
       console.log(`  ✅ ${product.name}`);

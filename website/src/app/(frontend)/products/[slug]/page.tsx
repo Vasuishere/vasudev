@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, FlaskConical, Package, Layers, ClipboardCheck, MessageCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FlaskConical, Package, Layers, ClipboardCheck, MessageCircle, FileText, Shield, MapPin, Tag } from 'lucide-react';
 import DriveImage from '@/components/ui/DriveImage';
 import { getProducts, getProductBySlug } from '@/lib/data';
 import { company } from '@/data/company';
@@ -33,6 +33,12 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     .filter((p) => p.category === product.category && p.slug !== product.slug)
     .slice(0, 4);
 
+  const categoryLabels: Record<string, string> = {
+    industrial: 'Industrial Chemical',
+    specialty: 'Specialty Chemical',
+    pharmaceutical: 'Pharma API Intermediate',
+  };
+
   return (
     <>
       {/* Breadcrumb */}
@@ -46,7 +52,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             <span className="text-white">{product.name}</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold font-heading mb-2">{product.name}</h1>
-          <p className="text-xl text-accent font-mono font-semibold">{product.formula}</p>
+          {product.formula && <p className="text-xl text-accent font-mono font-semibold">{product.formula}</p>}
         </div>
       </section>
 
@@ -94,17 +100,29 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 <h2 className="text-2xl font-bold font-heading text-text mb-4">Product Overview</h2>
                 <p className="text-text-light leading-relaxed text-lg">{product.description}</p>
                 <div className="flex flex-wrap gap-4 mt-6">
-                  <span className="inline-flex items-center gap-2 bg-primary/5 text-primary px-4 py-2 rounded-lg text-sm font-medium">
-                    <FlaskConical className="w-4 h-4" /> CAS: {product.cas}
-                  </span>
+                  {product.cas && (
+                    <span className="inline-flex items-center gap-2 bg-primary/5 text-primary px-4 py-2 rounded-lg text-sm font-medium">
+                      <FlaskConical className="w-4 h-4" /> CAS: {product.cas}
+                    </span>
+                  )}
                   <span className="inline-flex items-center gap-2 bg-secondary/5 text-secondary px-4 py-2 rounded-lg text-sm font-medium">
-                    <Layers className="w-4 h-4" /> {product.category === 'industrial' ? 'Industrial Chemical' : 'Specialty Chemical'}
+                    <Layers className="w-4 h-4" /> {categoryLabels[product.category] ?? product.category}
                   </span>
+                  {product.subcategory && (
+                    <span className="inline-flex items-center gap-2 bg-accent/10 text-text px-4 py-2 rounded-lg text-sm font-medium">
+                      <Tag className="w-4 h-4" /> {product.subcategory}
+                    </span>
+                  )}
+                  {product.sku && (
+                    <span className="inline-flex items-center gap-2 bg-surface-alt border border-border text-text-light px-4 py-2 rounded-lg text-sm font-mono">
+                      SKU: {product.sku}
+                    </span>
+                  )}
                 </div>
               </div>
 
               {/* Specifications */}
-              {product.specs && (
+              {product.specs && Object.keys(product.specs).length > 0 && (
                 <div>
                   <h2 className="text-2xl font-bold font-heading text-text mb-4">Technical Specifications</h2>
                   <div className="bg-surface-alt rounded-xl border border-border overflow-hidden">
@@ -122,30 +140,88 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 </div>
               )}
 
+              {/* Safety & Compliance */}
+              {(product.safetyClass || (product.documents && product.documents.length > 0)) && (
+                <div>
+                  <h2 className="text-2xl font-bold font-heading text-text mb-4">Safety &amp; Compliance</h2>
+                  {product.safetyClass && (
+                    <div className="flex items-center gap-3 mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                      <Shield className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                      <div>
+                        <span className="text-sm font-medium text-amber-800">Hazard Classification:</span>
+                        <span className="ml-2 text-sm text-amber-700">{product.safetyClass}</span>
+                      </div>
+                    </div>
+                  )}
+                  {product.documents && product.documents.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-text-light mb-3">Available Documents:</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {product.documents
+                          .filter((d) => d.accessLevel !== 'internal' && !d.fileUrl.includes('PLACEHOLDER_'))
+                          .map((doc, i) => {
+                            const inner = (
+                              <>
+                                <FileText className="w-5 h-5 text-primary flex-shrink-0" />
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium text-text truncate">{doc.fileName ?? doc.docType}</p>
+                                  <p className="text-xs text-text-muted">{doc.docType}{doc.accessLevel === 'on-request' ? ' — Available on request' : ''}</p>
+                                </div>
+                              </>
+                            );
+                            return doc.accessLevel === 'public' ? (
+                              <a
+                                key={i}
+                                href={doc.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 p-3 rounded-lg border transition-all border-border hover:border-primary/30 hover:bg-primary/5 cursor-pointer"
+                              >
+                                {inner}
+                              </a>
+                            ) : (
+                              <div
+                                key={i}
+                                className="flex items-center gap-3 p-3 rounded-lg border transition-all border-border bg-surface-alt cursor-default"
+                              >
+                                {inner}
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Applications */}
-              <div>
-                <h2 className="text-2xl font-bold font-heading text-text mb-4">Applications</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {product.applications.map((app, index) => (
-                    <li key={`${app}-${index}`} className="flex items-start gap-3 text-text-light">
-                      <ArrowRight className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
-                      <span>{app}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {product.applications && product.applications.length > 0 && (
+                <div>
+                  <h2 className="text-2xl font-bold font-heading text-text mb-4">Applications</h2>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {product.applications.map((app, index) => (
+                      <li key={`${app}-${index}`} className="flex items-start gap-3 text-text-light">
+                        <ArrowRight className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <span>{app}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Industries */}
-              <div>
-                <h2 className="text-2xl font-bold font-heading text-text mb-4">Industries Served</h2>
-                <div className="flex flex-wrap gap-2">
-                  {product.industries.map((ind) => (
-                    <span key={ind} className="bg-surface-alt border border-border text-text-light px-4 py-2 rounded-full text-sm">
-                      {ind}
-                    </span>
-                  ))}
+              {product.industries && product.industries.length > 0 && (
+                <div>
+                  <h2 className="text-2xl font-bold font-heading text-text mb-4">Industries Served</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {product.industries.map((ind) => (
+                      <span key={ind} className="bg-surface-alt border border-border text-text-light px-4 py-2 rounded-full text-sm">
+                        {ind}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -154,19 +230,61 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               <div className="bg-surface rounded-xl border border-border p-6 sticky top-28">
                 <h3 className="font-bold text-text font-heading text-lg mb-5">Product Details</h3>
                 <div className="space-y-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-text-light">Chemical Formula</span>
-                    <span className="font-mono font-semibold text-text">{product.formula}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-text-light">CAS Number</span>
-                    <span className="font-mono text-text">{product.cas}</span>
-                  </div>
+                  {product.formula && (
+                    <div className="flex justify-between">
+                      <span className="text-text-light">Chemical Formula</span>
+                      <span className="font-mono font-semibold text-text">{product.formula}</span>
+                    </div>
+                  )}
+                  {product.cas && (
+                    <div className="flex justify-between">
+                      <span className="text-text-light">CAS Number</span>
+                      <span className="font-mono text-text">{product.cas}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-text-light">Category</span>
                     <span className="text-text capitalize">{product.category}</span>
                   </div>
-                  {product.grades && (
+                  {product.sku && (
+                    <div className="flex justify-between">
+                      <span className="text-text-light">SKU</span>
+                      <span className="font-mono text-text text-xs">{product.sku}</span>
+                    </div>
+                  )}
+                  {product.supplier && (
+                    <div className="flex justify-between">
+                      <span className="text-text-light">Supplier</span>
+                      <span className="text-text">{product.supplier}</span>
+                    </div>
+                  )}
+                  {product.originCountry && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-text-light">Origin</span>
+                      <span className="inline-flex items-center gap-1.5 text-text">
+                        <MapPin className="w-3.5 h-3.5" /> {product.originCountry}
+                      </span>
+                    </div>
+                  )}
+                  {product.unitOfMeasure && (
+                    <div className="flex justify-between">
+                      <span className="text-text-light">Unit of Measure</span>
+                      <span className="text-text">{product.unitOfMeasure}</span>
+                    </div>
+                  )}
+                  {product.weight && (
+                    <div className="flex justify-between">
+                      <span className="text-text-light">Net Weight</span>
+                      <span className="text-text">{product.weight}</span>
+                    </div>
+                  )}
+                  {product.dimensions && (
+                    <div className="flex justify-between">
+                      <span className="text-text-light">Dimensions</span>
+                      <span className="text-text">{product.dimensions}</span>
+                    </div>
+                  )}
+                  {product.grades && product.grades.length > 0 && (
                     <div>
                       <span className="text-text-light block mb-2">Available Grades</span>
                       <div className="flex flex-wrap gap-1.5">
@@ -176,12 +294,22 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                       </div>
                     </div>
                   )}
-                  {product.packaging && (
+                  {product.packaging && product.packaging.length > 0 && (
                     <div>
                       <span className="text-text-light block mb-2">Packaging</span>
                       <div className="flex flex-wrap gap-1.5">
                         {product.packaging.map((pkg) => (
                           <span key={pkg} className="bg-surface-alt border border-border px-2.5 py-1 rounded text-xs">{pkg}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {product.tags && product.tags.length > 0 && (
+                    <div>
+                      <span className="text-text-light block mb-2">Tags</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {product.tags.map((tag) => (
+                          <span key={tag} className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[11px] font-medium">{tag}</span>
                         ))}
                       </div>
                     </div>
