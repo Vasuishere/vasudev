@@ -79,7 +79,7 @@ export default function Footer({ logo, logoName }: FooterProps) {
 
           {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">Contact Us</h4>
+            <h4 className="text-white font-semibold text-sm mb-4">Contact Now</h4>
             <div className="space-y-3 text-sm text-white/60">
               <p>📧 {company.email}</p>
               <p>📞 {company.phone}</p>

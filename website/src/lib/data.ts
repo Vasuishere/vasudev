@@ -129,7 +129,7 @@ export async function getCertifications(): Promise<Certification[]> {
       keyAreas: extractArray(doc.keyAreas as { value: string }[]),
       validUntil: doc.validUntil,
       importance: doc.importance,
-      imageUrl: (doc as Record<string, unknown>).imageUrl as string | undefined,
+      imageUrl: (doc as unknown as Record<string, unknown>).imageUrl as string | undefined,
     }));
   } catch {
     return [...staticCertifications];
@@ -157,7 +157,7 @@ export async function getCertificationBySlug(slug: string): Promise<Certificatio
       keyAreas: extractArray(doc.keyAreas as { value: string }[]),
       validUntil: doc.validUntil,
       importance: doc.importance,
-      imageUrl: (doc as Record<string, unknown>).imageUrl as string | undefined,
+      imageUrl: (doc as unknown as Record<string, unknown>).imageUrl as string | undefined,
     };
   } catch {
     return staticCertifications.find((c) => c.slug === slug);
@@ -180,7 +180,7 @@ export async function getIndustries(): Promise<Industry[]> {
       description: doc.description,
       longDescription: doc.longDescription,
       icon: doc.icon,
-      image: (doc as Record<string, unknown>).imageUrl as string || (typeof doc.image === 'object' && doc.image?.url ? doc.image.url : '/images/company-logo.png'),
+      image: (doc as unknown as Record<string, unknown>).imageUrl as string || (typeof doc.image === 'object' && doc.image?.url ? doc.image.url : '/images/company-logo.png'),
       keywords: extractArray(doc.keywords as { value: string }[]),
       challenges: extractArray(doc.challenges as { value: string }[]),
       solutions: extractArray(doc.solutions as { value: string }[]),
@@ -208,7 +208,7 @@ export async function getIndustryBySlug(slug: string): Promise<Industry | undefi
       description: doc.description,
       longDescription: doc.longDescription,
       icon: doc.icon,
-      image: (doc as Record<string, unknown>).imageUrl as string || (typeof doc.image === 'object' && doc.image?.url ? doc.image.url : '/images/company-logo.png'),
+      image: (doc as unknown as Record<string, unknown>).imageUrl as string || (typeof doc.image === 'object' && doc.image?.url ? doc.image.url : '/images/company-logo.png'),
       keywords: extractArray(doc.keywords as { value: string }[]),
       challenges: extractArray(doc.challenges as { value: string }[]),
       solutions: extractArray(doc.solutions as { value: string }[]),
@@ -237,7 +237,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       category: doc.category,
       date: typeof doc.date === 'string' ? doc.date.split('T')[0] : doc.date,
       thumbnail: typeof doc.thumbnail === 'object' && doc.thumbnail?.url ? doc.thumbnail.url : '/images/company-logo.png',
-      thumbnailUrl: (doc as Record<string, unknown>).thumbnailUrl as string | undefined,
+      thumbnailUrl: (doc as unknown as Record<string, unknown>).thumbnailUrl as string | undefined,
       readTime: doc.readTime,
     }));
   } catch {
@@ -267,7 +267,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | undefi
       category: doc.category,
       date: typeof doc.date === 'string' ? doc.date.split('T')[0] : doc.date,
       thumbnail: typeof doc.thumbnail === 'object' && doc.thumbnail?.url ? doc.thumbnail.url : '/images/company-logo.png',
-      thumbnailUrl: (doc as Record<string, unknown>).thumbnailUrl as string | undefined,
+      thumbnailUrl: (doc as unknown as Record<string, unknown>).thumbnailUrl as string | undefined,
       readTime: doc.readTime,
     };
   } catch {
@@ -287,7 +287,7 @@ export async function getClients(): Promise<Client[]> {
     return result.docs.map((doc) => ({
       name: doc.name,
       logo: typeof doc.logo === 'object' && doc.logo?.url ? doc.logo.url : '/images/company-logo.png',
-      logoUrl: (doc as Record<string, unknown>).logoUrl as string | undefined,
+      logoUrl: (doc as unknown as Record<string, unknown>).logoUrl as string | undefined,
     }));
   } catch {
     return [...staticClients];
@@ -405,7 +405,7 @@ export async function getSiteImages(): Promise<SiteImagesData> {
   try {
     const payload = await getPayloadClient();
     const doc = await payload.findGlobal({ slug: 'site-images' });
-    const d = doc as Record<string, unknown>;
+    const d = doc as unknown as Record<string, unknown>;
     return {
       heroBackground: d.heroBackground as string | undefined,
       heroOverlay: d.heroOverlay as string | undefined,
